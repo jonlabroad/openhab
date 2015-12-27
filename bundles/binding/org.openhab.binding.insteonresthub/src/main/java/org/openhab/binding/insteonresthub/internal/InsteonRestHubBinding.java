@@ -11,7 +11,8 @@ package org.openhab.binding.insteonresthub.internal;
 import java.util.Map;
 
 import org.openhab.binding.insteonresthub.InsteonRestHubBindingProvider;
-
+import org.openhab.binding.insteonresthub.internal.api.Authorization;
+import org.openhab.binding.insteonresthub.internal.api.Token;
 import org.apache.commons.lang.StringUtils;
 import org.openhab.core.binding.AbstractActiveBinding;
 import org.openhab.core.types.Command;
@@ -42,10 +43,9 @@ public class InsteonRestHubBinding extends AbstractActiveBinding<InsteonRestHubB
 
 	
 	/** 
-	 * the refresh interval which is used to poll values from the InsteonRestHub
-	 * server (optional, defaults to 60000ms)
+	 * Refresh interval is used for token refresh
 	 */
-	private long refreshInterval = 60000;
+	private long refreshInterval = 3600*60*1000;
 	
 	
 	public InsteonRestHubBinding() {
@@ -64,7 +64,11 @@ public class InsteonRestHubBinding extends AbstractActiveBinding<InsteonRestHubB
 		// the configuration is guaranteed not to be null, because the component definition has the
 		// configuration-policy set to require. If set to 'optional' then the configuration may be null
 		
-			
+		for (Map.Entry<String, Object> entry : configuration.entrySet())
+		{
+			System.out.println(entry.getKey() + " : " + entry.getValue());
+		}
+				
 		// to override the default refresh interval one has to add a 
 		// parameter to openhab.cfg like <bindingName>:refresh=<intervalInMs>
 		String refreshIntervalString = (String) configuration.get("refresh");
@@ -129,6 +133,8 @@ public class InsteonRestHubBinding extends AbstractActiveBinding<InsteonRestHubB
 	protected void execute() {
 		// the frequently executed code (polling) goes here ...
 		logger.debug("execute() method is called!");
+		Token oldToken = Authorization.getToken();
+		Authorization.refreshToken(oldToken);
 	}
 
 	/**
