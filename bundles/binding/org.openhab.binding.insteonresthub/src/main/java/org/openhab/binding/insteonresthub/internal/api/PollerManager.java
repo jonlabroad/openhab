@@ -1,40 +1,68 @@
 package org.openhab.binding.insteonresthub.internal.api;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.ScheduledFuture;
+import static org.quartz.JobBuilder.newJob;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
+import org.quartz.Job;
+import org.quartz.JobDataMap;
+import org.quartz.JobDetail;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.Trigger;
+import org.quartz.impl.StdSchedulerFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class PollerManager {
-	private static final int NUM_THREADS = 3;
+	private static final Logger logger = LoggerFactory.getLogger(PollerManager.class);
 	
-	private Map<String, ScheduledFuture<?>> _futureMap = null;
-	private ScheduledExecutorService _futureScheduler = null; 
 	public PollerManager() 
 	{
-		_futureScheduler = Executors.newScheduledThreadPool(NUM_THREADS);
-		_futureMap = new HashMap<String, ScheduledFuture<?>>();
 	}
 	
-	public void AddPoller(String name, Runnable task)
+	public void AddRepeatingPoller(String name, Class<?> jobClass, int repeatTimeSec)
 	{
-		//_futureMap.put(name, _futureScheduler.schedule(task, arg1, arg2));
+		Scheduler scheduler = GetScheduler();
+		
+		JobDataMap map = new JobDataMap();
+		//map.put("binding", jobInstance);
+
+		JobDetail job = newJob(TokenRefresher.class)
+				.withIdentity(name, "InsteonRestApi")
+				.usingJobData(map)
+				.build();
+
+		Trigger trigger = newTrigger()
+				.withIdentity(name, "InsteonRestApi")
+				.withSchedule(simpleSchedule()
+						.repeatForever()
+						.withIntervalInSeconds(repeatTimeSec)) //TODO configurable and changing based on expiration received from API            
+						.build();
+
+		try {
+			scheduler.scheduleJob(job, trigger);
+		} catch (SchedulerException e) {
+			logger.error("An exception occurred while scheduling a Quartz Job");
+		}
+	}
+	
+	private Scheduler GetScheduler()
+	{
+		Scheduler sched = null;
+		try {
+			sched =  StdSchedulerFactory.getDefaultScheduler();
+		} catch (SchedulerException e) {
+			logger.error("An exception occurred while getting a reference to the Quartz Scheduler");
+		}
+		return sched;
 	}
 	
 	public void StopAllPollers()
 	{
-		for (String key : _futureMap.keySet())
-		{
-			_futureMap.get(key).cancel(true);
-		}
 	}
 	
 	public void DestroyAllPollers()
 	{
-		for (String key : _futureMap.keySet())
-		{
-			_futureMap.remove(key).cancel(true);
-		}
 	}
 }

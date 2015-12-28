@@ -47,6 +47,7 @@ public class InsteonRestHubBinding extends AbstractActiveBinding<InsteonRestHubB
 	 */
 	private long refreshInterval = 3600*60*1000;
 	
+	private InsteonRestApi api = null;
 	
 	public InsteonRestHubBinding() {
 	}
@@ -63,9 +64,14 @@ public class InsteonRestHubBinding extends AbstractActiveBinding<InsteonRestHubB
 
 		// the configuration is guaranteed not to be null, because the component definition has the
 		// configuration-policy set to require. If set to 'optional' then the configuration may be null
-		
 		for (Map.Entry<String, Object> entry : configuration.entrySet())
 		{
+			//TODO allow multiple instances/ports?
+			if (entry.getKey().startsWith("hub_")) {
+				String[] usernamePasswordPair = entry.getValue().toString().split(":");
+				//TODO check for invalid input
+				api = new InsteonRestApi(usernamePasswordPair[0], usernamePasswordPair[1]);
+			}
 			System.out.println(entry.getKey() + " : " + entry.getValue());
 		}
 				
@@ -78,6 +84,7 @@ public class InsteonRestHubBinding extends AbstractActiveBinding<InsteonRestHubB
 
 		// read further config parameters here ...
 
+		
 		setProperlyConfigured(true);
 	}
 	

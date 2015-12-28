@@ -24,6 +24,9 @@ Import-Package: org.apache.commons.codec;version="1.4.0",
  org.osgi.framework,
  org.osgi.service.component,
  org.osgi.service.event,
+ org.quartz,
+ org.quartz.impl,
+ org.quartz.utils,
  org.slf4j
 Export-Package: org.openhab.binding.insteonresthub
 Bundle-DocURL: http://www.openhab.org
