@@ -8,6 +8,7 @@
  */
 package org.openhab.binding.insteonresthub;
 
+import org.openhab.binding.insteonresthub.internal.InsteonRestHubGenericBindingProvider.InsteonRestHubBindingConfig;
 import org.openhab.core.binding.BindingProvider;
 
 /**
@@ -15,5 +16,11 @@ import org.openhab.core.binding.BindingProvider;
  * @since 1.8.0
  */
 public interface InsteonRestHubBindingProvider extends BindingProvider {
-
+	/**
+	 * Returns the binding configuration for the item with
+	 * this name.
+	 * @param itemName the name to get the binding configuration for.
+	 * @return the binding configuration.
+	 */
+	public InsteonRestHubBindingConfig getInsteonRestHubBindingConfig(String itemName);
 }

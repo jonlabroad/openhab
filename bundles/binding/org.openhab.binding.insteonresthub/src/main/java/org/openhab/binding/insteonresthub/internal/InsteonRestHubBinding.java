@@ -153,6 +153,15 @@ public class InsteonRestHubBinding extends AbstractActiveBinding<InsteonRestHubB
 		// event bus goes here. This method is only called if one of the 
 		// BindingProviders provide a binding for the given 'itemName'.
 		logger.debug("internalReceiveCommand({},{}) is called!", itemName, command);
+		
+		//TODO probably not send them to all providers... or yes? I don't know
+		for (InsteonRestHubBindingProvider provider : providers)
+		{
+			if (provider instanceof InsteonRestHubGenericBindingProvider)
+			{
+				api.receiveCommand((InsteonRestHubGenericBindingProvider)provider, itemName, command);
+			}
+		}
 	}
 	
 	/**

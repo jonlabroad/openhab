@@ -30,13 +30,19 @@ public class Authorization {
 	
 	private static Token _currentToken = null;
 	
+	public static void addAuthHeaders(PostMethod method)
+	{
+		method.addRequestHeader("Authentication", "APIKey " + InsteonApiConstants.Instance().API_KEY);
+		method.addRequestHeader("Authorization", _currentToken.TokenType + " " + _currentToken.Token);
+	}
+	
 	public static Token getNewToken(String username, String password)
 	{
 		Map<String, String> params = setupApiKeyParams(username, password);
 		PostMethod postMethod = RestClient.ExecutePost(
 				InsteonApiConstants.Instance().BASE_URL,
 				AUTH_ENDPOINT,
-				params);
+				params, null, false);
 		Token token = parseTokenFromResponse(postMethod);
 		_currentToken = token;
 		return token;
@@ -48,7 +54,7 @@ public class Authorization {
 		PostMethod postMethod = RestClient.ExecutePost(
 				InsteonApiConstants.Instance().BASE_URL,
 				AUTH_ENDPOINT,
-				params);
+				params, null, false);
 		Token token = parseTokenFromResponse(postMethod);
 		_currentToken = token;
 		return token;
