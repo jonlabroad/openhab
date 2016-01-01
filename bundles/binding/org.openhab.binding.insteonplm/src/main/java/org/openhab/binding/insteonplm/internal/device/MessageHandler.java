@@ -776,7 +776,7 @@ public abstract class MessageHandler {
 		public void handleMessage(int group, byte cmd1, Msg msg,
 				DeviceFeature f, String fromPort) {
 			m_feature.publish(OpenClosedType.OPEN, StateChangeType.ALWAYS);
-			sendExtendedQuery(f, (byte)0x2e, (byte) 00);
+			//sendExtendedQuery(f, (byte)0x2e, (byte) 00);
 		}
 	}
 
